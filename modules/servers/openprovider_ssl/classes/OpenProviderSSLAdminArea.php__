@@ -1,0 +1,135 @@
+<?php
+
+namespace Module\OpenproviderSsl\Server\classes;
+
+use Module\OpenproviderSsl\Server\classes\ApiCall;
+
+use WHMCS\Database\Capsule;
+use WHMCS\Module\Server\OpenproviderSsl\Helper;
+
+if (!defined("WHMCS")) {
+    exit("This file cannot be accessed directly");
+}
+
+class OpenProviderSSLAdminArea
+{
+    private $config;
+    private $whmcs;
+    private $lang;
+    private $helper;
+    private $apiCall;
+
+    public function __construct()
+    {
+        global $CONFIG, $whmcs, $LANG;
+
+        $this->config = $CONFIG;
+        $this->whmcs = $whmcs;
+        $this->lang = $LANG;
+        $this->helper = new Helper();
+        $this->apiCall = new apiCall();
+    }
+
+    public function renderPage($vars)
+    {
+        try {
+           
+            if (isset($vars['addon_modules']['openprovider_ssl'])) {
+                $this->loadLanguage($this->config['Language']);
+                $this->handleCSRRequest($vars);
+                return $this->getHtml($vars);
+            }
+        } catch (\Exception $e) {
+            logActivity("Error Occur Openprovider SSL AdminAreaHeadOutput" . $e->getMessage());
+        }
+    }
+
+    private function loadLanguage($language)
+    {
+        $langfilename = __DIR__ . '/lang/' . $language . '.php';
+        if (file_exists($langfilename)) {
+            require($langfilename);
+        } else {
+            require(__DIR__ . '/lang/english.php');
+        }
+        $this->lang = $_ADDONLANG;
+    }
+
+    private function handleCSRRequest($vars)
+    {
+        if ($vars['filename'] == 'configproducts' && $this->isCSRRequest()) {
+            $data = $this->parseCSRData();
+            $postData = $this->prepareCSRData($data);
+            $baseUrl = $this->helper->getBaseUrl();
+            $createCSRToken = $this->apiCall->post($baseUrl . '/ssl/csr', $postData, "Create CSR Token");
+
+            if ($createCSRToken['httpcode'] != '200' || empty($createCSRToken['result']->data->csr)) {
+                $this->helper->sendResponse(false, "Something Went Wrong!");
+            }
+
+            $this->sendCSRResponse($createCSRToken['result']->data);
+        }
+    }
+
+    private function isCSRRequest()
+    {
+        return ($this->whmcs->get_req_var("ajaxaction") == "create token") &&
+            ($this->whmcs->get_req_var("ajaxcall") == "true");
+    }
+
+    private function parseCSRData()
+    {
+        $data = html_entity_decode($this->whmcs->get_req_var("data"));
+        parse_str($data, $dataArray);
+        return $dataArray;
+    }
+
+    private function prepareCSRData($data)
+    {
+        return [
+            "bits" => (int) 2048,
+            "common_name" => $data['common_name'],
+            "country" => $data['country'],
+            "email" => $data['email'],
+            "locality" => $data['locality'],
+            "organization" => $data['organization'],
+            "signature_hash_algorithm" => $data['signature_hash_algorithm'],
+            "state" => $data['state'],
+            "unit" => $data['unit'],
+            "with_config" => (bool)$data['with_config']
+        ];
+    }
+
+    private function sendCSRResponse($csrData)
+    {
+        $message = [
+            "status" => true,
+            'message' => 'CSR Token Created Successfully!',
+            "data" => $csrData,
+            'fieldId' => '',
+            'adminId' => 'textarea[name=\'packageconfigoption[6]\']'
+        ];
+        echo json_encode($message);
+        exit;
+    }
+
+    private function getHtml($vars)
+    {
+        if ($vars['filename'] == 'configproducts') {
+            $countries = new WHMCS\Utility\Country();
+            $countries = $countries->getCountryNameArray();
+
+            $html = '';
+            $html .= '
+            <script src="' . $this->config["SystemURL"] . '/assets/js/StatesDropdown.js"></script>
+            <script src="' . $this->config["SystemURL"] . '/modules/servers/openprovider_ssl/assets/js/jquerygrowl.js" type="text/javascript"></script>
+            <link href="' . $this->config["SystemURL"] . '/modules/servers/openprovider_ssl/assets/css/jquerygrowl.css" rel="stylesheet" type="text/css" />
+            <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.js"></script>
+            <link rel="stylesheet" type="text/css" href="' . $this->config["SystemURL"] . '/modules/servers/openprovider_ssl/assets/css/style.css">
+            <script type="text/javascript" src="' . $this->config["SystemURL"] . '/modules/servers/openprovider_ssl/assets/js/script.js"></script>';
+            $html .= $this->helper->createCsrTokenHtml($countries, $this->lang, 'yes');
+            return $html;
+        }
+        return '';
+    }
+}

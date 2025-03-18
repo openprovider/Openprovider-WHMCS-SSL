@@ -1,0 +1,117 @@
+<?php
+
+namespace Module\OpenproviderSsl\classes;
+
+use WHMCS\Database\Capsule;
+use Module\OpenproviderSsl\classes\EmailTemplates;
+
+class CustomDatabase
+{
+
+    /* creating custom table if not exist */
+    public function createTableIfNotExist()
+    {
+        try {
+            if (!Capsule::schema()->hasTable('modssl_api_setting')) {
+                Capsule::schema()->create(
+                    'modssl_api_setting',
+                    function ($table) {
+                        $table->increments('id');
+                        $table->longText('api_url'); // For storing long URLs
+                        $table->string('api_user_name'); // Username for API access
+                        $table->string('api_password'); // Password for API access
+                        $table->string('token')->nullable(); // Token can be null
+                        $table->string('status')->default('no'); // Token can be null
+                    }
+                );
+            }
+        } catch (\Exception $e) {
+            logActivity("Unable to create modssl_api_setting: {$e->getMessage()}");
+            throw new \Exception('Error creating table modssl_api_setting : ' . $e->getMessage());
+        }
+
+        try {
+            if (!Capsule::schema()->hasTable('modssl_product_info')) {
+                Capsule::schema()->create(
+                    'modssl_product_info',
+                    function ($table) {
+                        $table->increments('id');
+                        $table->integer('pid'); // For storing long URLs
+                        $table->integer('gid'); // Username for API access
+                        $table->integer('ssl_pid'); // Password for API access
+                        $table->string('ssl_pname'); // Token can be null
+                    }
+                );
+            }
+        } catch (\Exception $e) {
+            logActivity("Unable to create modssl_product_info: {$e->getMessage()}");
+            throw new \Exception('Error creating table modssl_product_info : ' . $e->getMessage());
+        }
+        try {
+            if (!Capsule::schema()->hasTable('modssl_logs')) {
+                Capsule::schema()
+                    ->create(
+                        'modssl_logs',
+                        function ($table) {
+                            $table->increments('id');
+                            $table->integer('reseller_id');
+                            $table->datetime('date');
+                            $table->string('module');
+                            $table->string('action');
+                            $table->text('request');
+                            $table->text('response');
+                        }
+                    );
+            }
+        } catch (\Exception $e) {
+            logActivity("Unable to create modssl_logs: {$e->getMessage()}");
+            throw new \Exception('Error creating table modssl_logs : ' . $e->getMessage());
+        }
+
+        try {
+            return [
+                'status' => 'success',
+                'description' => 'Module has been activated successfully',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => "error",
+                'description' => 'Unable to create custom table for addon module openprovider_ssl: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    /* delete custom table */
+    public function deleteTalbe()
+    {
+        try {
+            $deleteDbTable = Capsule::table('tbladdonmodules')->where('module', 'openprovider_ssl')->where('setting', 'delete_db')->first();
+            if ($deleteDbTable->value == 'on') {
+                // Capsule::schema()->dropIfExists('modssl_api_setting');
+
+                $tables = [
+                    'modssl_api_setting',
+                    'modssl_product_info',
+                ];
+                foreach ($tables as $table) {
+                    Capsule::schema()->dropIfExists($table);
+                }
+            }
+            return [
+                'status' => 'success',
+                'description' => 'Module deactivated successfully!',
+            ];
+        } catch (\Exception $e) {
+            return [
+                "status" => "error",
+                "description" => "Unable to drop soyoustart module tables: {$e->getMessage()}",
+            ];
+        }
+    }
+
+    /* upgrade database */
+    public function upgradeDB()
+    {
+        $this->createTableIfNotExist();
+    }
+}

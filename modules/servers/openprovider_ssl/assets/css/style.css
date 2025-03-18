@@ -1,0 +1,198 @@
+/* csr token start */
+.input-div input,
+.input-div select {
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+#create_csr .modal-header h4 {
+    color: #fff;
+}
+
+#create_csr_body {
+    padding-bottom: 0px;
+}
+
+.modal-footer {
+    padding: 12px;
+    /* text-align: right; */
+    border-top: 1px solid #e5e5e5;
+    /* display: flex; */
+    /* justify-content: end; */
+    margin-top: 10px;
+}
+
+.error {
+    color: #ff0000;
+}
+
+.modal-header>.close {
+    color: #fff;
+    opacity: unset;
+}
+
+#create_csr .modal-header.panel-heading {
+    background-color: #2f5885;
+}
+
+a.btn-csr {
+    padding: 10px;
+    background: #369;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 14px;
+}
+a.btn-csr:hover {
+    text-decoration: none;
+    color: #fff;
+    background-color: #29537c;
+    border-color: #264d73;
+}
+a#admin-csr-btn {
+    float: left;
+    margin-top: 10px;
+    text-decoration: none;
+}
+
+.admin-copy-csr .copy-btn:hover span#myTooltip {
+    visibility: visible;
+    opacity: 1;
+    right: 0px;
+    top: -17px;
+    background: #555;
+    color: #ffff;
+    padding: 2px 6px;
+    border-radius: 15px;
+    font-size: 10px;
+    min-width: 100px;
+    text-align: center;
+}
+.admin-copy-csr .copy-btn {
+    position: relative;
+}
+.admin-copy-csr .copy-btn {
+    text-align: right;
+    margin-right: 20px;
+    margin-top: 0px;
+    cursor: pointer;
+}
+#create_csr_body select.error, #create_csr_body input.error {
+    color: #909090;
+}
+/* csr token end */
+
+/* order Info admin area start */
+div#order_heading {
+    background: #fff;
+    margin: 2px;
+    border-radius: 10px;
+}
+div#order_heading table thead tr th {
+    border-bottom: 0;
+}
+div#order_heading .table tbody tr td, div#order_heading .table thead tr th {
+    padding: 16px !important;
+}
+
+.badge-success {
+    color: #fff;
+    background-color: #28a745;
+}
+.badge-danger {
+    color: #fff;
+    background-color: #dc3545;
+}
+.badge-info {
+    color: #fff;
+    background-color: #17a2b8;
+}
+/* order Info admin area end */
+
+/* order Info client area start */
+.module-client-area {
+    padding: 0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+}
+.module-client-area table thead tr th:first-child{
+    border: 0;
+}
+.module-client-area table thead tr th, .module-client-area table tbody tr td{
+    text-align: left;
+}
+.module-client-area table{
+    margin-bottom: 0;
+}
+.module-client-area table tbody tr td, .module-client-area table thead tr th {
+    padding: 12px !important;
+}
+.module-client-area table tbody tr td{
+    color: #212529ad;
+    font-weight: 500;
+}
+
+.copy-btns:hover span#myTooltip {
+    visibility: visible;
+    opacity: 1;
+    right: 0px;
+    top: -17px;
+    background: #555;
+    color: #ffff;
+    padding: 2px 6px;
+    border-radius: 15px;
+    font-size: 10px;
+    min-width: 100px;
+    text-align: center;
+}
+.copy-btns {
+    position: relative;
+}
+.copy-btns {
+    text-align: right;
+    margin-right: 5px;
+    margin-top: 0px;
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+}
+.modal#update_method .modal-header, .modal#update_email .modal-header, .modal#create_csr .modal-header {
+    background-color: #1a4d80;
+    display: flex;
+    align-items: center;
+}
+.modal#update_method .modal-header:before, .modal#update_email .modal-header:before, .modal#create_csr .modal-header:before {
+    display: none;
+}
+.modal#update_method .modal-header .close, .modal#update_email .modal-header .close, .modal#create_csr .modal-header .close  {
+    margin: -1rem -1rem -1rem auto;
+}
+#update_method  .modal-title, #update_email  .modal-title {
+    color: #fff;
+    font-size: 18px;
+}
+.update_method_data, .update_email_data {
+ text-align: left;
+}
+.admin-copy-csr {
+    position: absolute;
+    right: 20px;
+}
+div#order_heading tr td:first-child {
+    color: #000;
+}
+div#order_heading td {
+    font-size: 14px;
+}
+div#order_heading tr td {
+    color: #212529ad;
+}
+@media (min-width: 768px) {
+    #update_method .modal-dialog {
+        width: 600px;
+    }
+}
+/* order Info client area end */
+
