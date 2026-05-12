@@ -14,7 +14,7 @@ try {
     $helper = new Helper();
 
     // $productData = Capsule::table('tblproducts')->where('id', $whmcs->get_req_var("reseller_pid"))->first();
-    // $baseUrl = ($productData->configoption3 == '') ? 'https://bill.ultahost.com/' : $productData->configoption3;
+    // $baseUrl = ($productData->configoption3 == '') ? 'https://www.openprovider.com/' : $productData->configoption3;
 
     // if (($whmcs->get_req_var("ajaxaction") == "Product Description") && ($whmcs->get_req_var("ajaxcall") == true)) {
 

@@ -8,7 +8,7 @@
 
 <div class="add_hdr toggle-header-main">
     <div class="smarttech-header-icon">
-        <a href="https://ultahost.com/" class="small_logo bars-icon" target="_blank"><img
+    <a href="https://www.openprovider.com/" class="small_logo bars-icon" target="_blank"><img
                 src="{$tplVar['urlPath']}assets/images/openprovider.png"></a>
     </div>
 
