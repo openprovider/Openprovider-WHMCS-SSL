@@ -34,7 +34,7 @@ class HandleCSRCreation
             parse_str($data, $dataArray);
 
             $postData = [
-                "bits" => (int) 4098,
+                "bits" => (int) 4096,
                 "common_name" => $vars['domain'],
                 "country" => $dataArray['country'],
                 "email" => $dataArray['email'],
