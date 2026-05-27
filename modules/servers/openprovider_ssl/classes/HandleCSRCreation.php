@@ -33,9 +33,13 @@ class HandleCSRCreation
             $data = html_entity_decode($whmcs->get_req_var("data"));
             parse_str($data, $dataArray);
 
+            $commonName = !empty($dataArray['common_name'])
+            ? trim($dataArray['common_name'])
+            : $vars['domain'];
+
             $postData = [
-                "bits" => (int) 4098,
-                "common_name" => $vars['domain'],
+                "bits" => (int) 4096,
+                "common_name" => $commonName,
                 "country" => $dataArray['country'],
                 "email" => $dataArray['email'],
                 "locality" => $dataArray['locality'],
@@ -45,7 +49,7 @@ class HandleCSRCreation
                 "unit" => $dataArray['unit'],
                 "with_config" => (bool)$dataArray['with_config'],
                 "subject_alternative_name" => [
-                    "www.".$vars['domain'],
+                    $commonName,
                 ],
             ];
             $baseUrl = $this->helper->getBaseUrl();

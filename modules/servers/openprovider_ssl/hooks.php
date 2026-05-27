@@ -152,7 +152,7 @@ add_hook('AdminAreaHeadOutput', 1, function ($vars) {
                     parse_str($data, $dataArray);
 
                     $postData = [
-                        "bits" => (int) 4098,
+                        "bits" => (int) 4096,
                         "common_name" => $dataArray['common_name'],
                         "country" => $dataArray['country'],
                         "email" => $dataArray['email'],
