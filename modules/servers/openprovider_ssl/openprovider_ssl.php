@@ -307,8 +307,9 @@ function openprovider_ssl_CreateAccount(array $params)
         $apiCall = new ApiCall();
         $serviceId = $params['serviceid'];
         $pid = $params['pid'];
-
+        logModuleCall('Test 1', 'test I am here', 'test I am here', null, null, null);
         $handle = $helper->getClientCustomField($params['userid']);
+        logModuleCall('Test 2', 'Get Client Custom Field', $params['userid'], $handle, null, null);
 
         $orgnizationHandle = "";
 
