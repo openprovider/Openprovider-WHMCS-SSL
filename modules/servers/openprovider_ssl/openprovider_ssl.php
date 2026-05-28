@@ -380,8 +380,8 @@ function openprovider_ssl_CreateAccount(array $params)
             "signature_hash_algorithm" => $params['configoption4'],
         ];
         logModuleCall('Openprovider SSL test', __FUNCTION__, $postData, null, null, null);
-        $createOrder = [];
-        // $createOrder = $apiCall->post($baseUrl . '/ssl/orders', $postData, "Create order");
+        // $createOrder = [];
+        $createOrder = $apiCall->post($baseUrl . '/ssl/orders', $postData, "Create order");
 
         if ($createOrder['httpcode'] != 200) {
             return $createOrder['result']->desc;
