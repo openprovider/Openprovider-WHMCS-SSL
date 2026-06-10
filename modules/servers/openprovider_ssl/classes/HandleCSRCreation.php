@@ -67,10 +67,10 @@ class HandleCSRCreation
             exit;
         }
 
-        return $this->generateHTML($csrCustomFieldId);
+        return $this->generateHTML($csrCustomFieldId, false, $vars['domain']);
     }
 
-    private function generateHTML($csrCustomFieldId, $isAdmin = false)
+    private function generateHTML($csrCustomFieldId, $isAdmin = false, $domain = '')
     {
         global $CONFIG, $LANG;
 
@@ -124,7 +124,7 @@ class HandleCSRCreation
             });
         </script>';
         }
-        $html .= $this->helper->createCsrTokenHtml($countries, $LANG);
+        $html .= $this->helper->createCsrTokenHtml($countries, $LANG, '', $domain);
 
         return $html;
     }
