@@ -161,9 +161,9 @@ add_hook('AdminAreaHeadOutput', 1, function ($vars) {
                         "signature_hash_algorithm" => $dataArray['signature_hash_algorithm'],
                         "state" => $dataArray['state'],
                         "unit" => $dataArray['unit'],
-                        "with_config" => (bool)$dataArray['with_config'],
+                        "with_config" => filter_var($dataArray['with_config'], FILTER_VALIDATE_BOOLEAN),
                         "subject_alternative_name" => [
-                            "www.".$dataArray['common_name'],
+                            str_starts_with($dataArray['common_name'], '*.') ? $dataArray['common_name'] : 'www.' . $dataArray['common_name'],
                         ],
                     ];
                     $baseUrl = $helper->getBaseUrl();
