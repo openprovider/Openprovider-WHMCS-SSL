@@ -319,10 +319,14 @@ class Helper
                                                     <input type="email" id="email" name="email" placeholder="' . $LANG['email_text'] . '" value="" >
                                                 </div>
                                             </div>';
-            $html .= '
-            <label>' . $LANG['common_name'] . '</label>
-            <input type="text" name="common_name" class="form-control" placeholder="example.com or *.example.com">
-            ';
+            $html .= '<div class="col-md-6">
+                                                <div class="csr_token_content_main">
+                                                    <label for="common_name">' . $LANG['common_name'] . '</label>
+                                                </div>
+                                                <div class="input-div">
+                                                    <input type="text" id="common_name" name="common_name" class="form-control" placeholder="' . $LANG['common_name_text'] . '" value="" >
+                                                </div>
+                                            </div>';
 
             $html .= '<div class="col-md-6">
                                                 <div class="csr_token_content_main">
