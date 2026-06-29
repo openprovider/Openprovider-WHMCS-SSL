@@ -14,6 +14,7 @@ $_ADDONLANG["organization"] = "Organization";
 $_ADDONLANG["country"] = "Country";
 $_ADDONLANG["select_country"] = "Select Country";
 $_ADDONLANG["common_name"] = "Common Name (Domain)";
+$_ADDONLANG["common_name_text"] = "example.com or *.example.com";
 $_ADDONLANG["email"] = "Email Address";
 $_ADDONLANG["sha2"] = "SHA-2";
 $_ADDONLANG["sha1"] = "SHA-1";

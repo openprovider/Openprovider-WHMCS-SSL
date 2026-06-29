@@ -276,7 +276,7 @@ class Helper
         return $html;
     }
 
-    public function createCsrTokenHtml($clientcountries, $LANG, $action = '')
+    public function createCsrTokenHtml($clientcountries, $LANG, $action = '', $domain = '')
     {
         try {
             $html = '';
@@ -319,16 +319,14 @@ class Helper
                                                     <input type="email" id="email" name="email" placeholder="' . $LANG['email_text'] . '" value="" >
                                                 </div>
                                             </div>';
-            if ($action == 'yes') {
-                $html .= '<div class="col-md-6">
-                                            <div class="csr_token_content_main">
-                                                <label for="common_name">' . $LANG['common_name'] . '</label>
-                                            </div>
-                                            <div class="input-div">
-                                                <input type="text" id="common_name" placeholder="' . $LANG['common_name'] . '" name="common_name" value="" >
-                                            </div>
-                                        </div>';
-            }
+            $html .= '<div class="col-md-6">
+                                                <div class="csr_token_content_main">
+                                                    <label for="common_name">' . $LANG['common_name'] . '</label>
+                                                </div>
+                                                <div class="input-div">
+                                                    <input type="text" id="common_name" name="common_name" class="form-control" placeholder="' . $LANG['common_name_text'] . '" value="' . htmlspecialchars($domain) . '" >
+                                                </div>
+                                            </div>';
 
             $html .= '<div class="col-md-6">
                                                 <div class="csr_token_content_main">

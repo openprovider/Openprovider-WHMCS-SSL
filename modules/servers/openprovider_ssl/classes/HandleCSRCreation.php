@@ -33,9 +33,13 @@ class HandleCSRCreation
             $data = html_entity_decode($whmcs->get_req_var("data"));
             parse_str($data, $dataArray);
 
+            $commonName = !empty($dataArray['common_name'])
+            ? trim($dataArray['common_name'])
+            : $vars['domain'];
+
             $postData = [
-                "bits" => (int) 4098,
-                "common_name" => $vars['domain'],
+                "bits" => (int) 4096,
+                "common_name" => $commonName,
                 "country" => $dataArray['country'],
                 "email" => $dataArray['email'],
                 "locality" => $dataArray['locality'],
@@ -43,9 +47,9 @@ class HandleCSRCreation
                 "signature_hash_algorithm" => $dataArray['signature_hash_algorithm'],
                 "state" => $dataArray['state'],
                 "unit" => $dataArray['unit'],
-                "with_config" => (bool)$dataArray['with_config'],
+                "with_config" => filter_var($dataArray['with_config'], FILTER_VALIDATE_BOOLEAN),
                 "subject_alternative_name" => [
-                    "www.".$vars['domain'],
+                    str_starts_with($commonName, '*.') ? $commonName : 'www.' . $commonName,
                 ],
             ];
             $baseUrl = $this->helper->getBaseUrl();
@@ -63,10 +67,10 @@ class HandleCSRCreation
             exit;
         }
 
-        return $this->generateHTML($csrCustomFieldId);
+        return $this->generateHTML($csrCustomFieldId, false, $vars['domain']);
     }
 
-    private function generateHTML($csrCustomFieldId, $isAdmin = false)
+    private function generateHTML($csrCustomFieldId, $isAdmin = false, $domain = '')
     {
         global $CONFIG, $LANG;
 
@@ -120,7 +124,7 @@ class HandleCSRCreation
             });
         </script>';
         }
-        $html .= $this->helper->createCsrTokenHtml($countries, $LANG);
+        $html .= $this->helper->createCsrTokenHtml($countries, $LANG, '', $domain);
 
         return $html;
     }
