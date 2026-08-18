@@ -307,7 +307,21 @@ function openprovider_ssl_CreateAccount(array $params)
         $apiCall = new ApiCall();
         $serviceId = $params['serviceid'];
         $pid = $params['pid'];
-
+        logModuleCall(
+            'Openprovider SSL Debug',
+            'CreateAccount Params',
+            [
+                'domain' => $params['domain'] ?? null,
+                'customfields' => $params['customfields'] ?? null,
+                'configoptions' => $params['configoptions'] ?? null,
+                'configoption1' => $params['configoption1'] ?? null,
+                'configoption2' => $params['configoption2'] ?? null,
+                'configoption3' => $params['configoption3'] ?? null,
+                'configoption4' => $params['configoption4'] ?? null,
+                'configoption5' => $params['configoption5'] ?? null,
+            ],
+            ''
+        );
         $handle = $helper->getClientCustomField($params['userid']);
 
         $orgnizationHandle = "";
