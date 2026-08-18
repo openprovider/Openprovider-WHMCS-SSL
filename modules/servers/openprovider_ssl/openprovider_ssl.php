@@ -307,21 +307,7 @@ function openprovider_ssl_CreateAccount(array $params)
         $apiCall = new ApiCall();
         $serviceId = $params['serviceid'];
         $pid = $params['pid'];
-        logModuleCall(
-            'Openprovider SSL Debug',
-            'CreateAccount Params',
-            [
-                'domain' => $params['domain'] ?? null,
-                'customfields' => $params['customfields'] ?? null,
-                'configoptions' => $params['configoptions'] ?? null,
-                'configoption1' => $params['configoption1'] ?? null,
-                'configoption2' => $params['configoption2'] ?? null,
-                'configoption3' => $params['configoption3'] ?? null,
-                'configoption4' => $params['configoption4'] ?? null,
-                'configoption5' => $params['configoption5'] ?? null,
-            ],
-            ''
-        );
+
         $handle = $helper->getClientCustomField($params['userid']);
 
         $orgnizationHandle = "";
@@ -396,17 +382,16 @@ function openprovider_ssl_CreateAccount(array $params)
             "signature_hash_algorithm" => $params['configoption4'],
         ];
 
-        // $createOrder = $apiCall->post($baseUrl . '/ssl/orders', $postData, "Create order");
+        $createOrder = $apiCall->post($baseUrl . '/ssl/orders', $postData, "Create order");
 
-        // if ($createOrder['httpcode'] != 200) {
-        //     return $createOrder['result']->desc;
-        // }
+        if ($createOrder['httpcode'] != 200) {
+            return $createOrder['result']->desc;
+        }
 
-        // $fields = ["ssl_id" => $createOrder['result']->data->id, "organization_handle" => $orgnizationHandle];
-        // $helper->insert_custom_fields_value($serviceId, $pid, $fields);
+        $fields = ["ssl_id" => $createOrder['result']->data->id, "organization_handle" => $orgnizationHandle];
+        $helper->insert_custom_fields_value($serviceId, $pid, $fields);
 
-        // logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $createOrder['result']);
-        logModuleCall('Openprovider SSL', __FUNCTION__, $postData, "Create order API call is commented for testing purpose");
+        logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $createOrder['result']);
         return "success";
     } catch (Exception $e) {
         logModuleCall('Openprovider SSL', __FUNCTION__, $params, $e->getMessage(), $e->getTraceAsString());
