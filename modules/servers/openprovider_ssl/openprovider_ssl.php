@@ -396,16 +396,17 @@ function openprovider_ssl_CreateAccount(array $params)
             "signature_hash_algorithm" => $params['configoption4'],
         ];
 
-        $createOrder = $apiCall->post($baseUrl . '/ssl/orders', $postData, "Create order");
+        // $createOrder = $apiCall->post($baseUrl . '/ssl/orders', $postData, "Create order");
 
-        if ($createOrder['httpcode'] != 200) {
-            return $createOrder['result']->desc;
-        }
+        // if ($createOrder['httpcode'] != 200) {
+        //     return $createOrder['result']->desc;
+        // }
 
-        $fields = ["ssl_id" => $createOrder['result']->data->id, "organization_handle" => $orgnizationHandle];
-        $helper->insert_custom_fields_value($serviceId, $pid, $fields);
+        // $fields = ["ssl_id" => $createOrder['result']->data->id, "organization_handle" => $orgnizationHandle];
+        // $helper->insert_custom_fields_value($serviceId, $pid, $fields);
 
-        logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $createOrder['result']);
+        // logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $createOrder['result']);
+        logModuleCall('Openprovider SSL', __FUNCTION__, $postData, "Create order API call is commented for testing purpose");
         return "success";
     } catch (Exception $e) {
         logModuleCall('Openprovider SSL', __FUNCTION__, $params, $e->getMessage(), $e->getTraceAsString());
