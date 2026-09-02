@@ -29,6 +29,11 @@ $_ADDONLANG["email_text"] = "Requester email address";
 $_ADDONLANG["organization_text"] = "Enrolling company name";
 $_ADDONLANG["subject_alternative_text"] = "Additional domains in a case of Multi-domain certificate";
 $_ADDONLANG["locality_text"] = "Enrolling company's location, i.e. street name and number";
+$_ADDONLANG["private_key"] = "Private Key";
+$_ADDONLANG["copy_private_key"] = "Copy Private Key";
+$_ADDONLANG["private_key_warning"] = "This private key is generated once and cannot be retrieved again. Please save it in a secure location before closing this window.";
+$_ADDONLANG["confirm_key_saved"] = "I have saved my private key";
+$_ADDONLANG["confirm_key_saved_required"] = "Please confirm you have saved your private key before closing this window.";
 
 // csr token end
 

@@ -108,9 +108,25 @@ class ApiCall
             throw new \Exception(curl_error($curl));
         }
         curl_close($curl);
-        logModuleCall("Open Provider SSl", $action, $data, json_decode($response));
-        $helper->insertlogDetails(json_decode($response), (empty($data) ? ['url' => $apiUrl] : $data), $action);
-        return ['httpcode' => $httpCode, 'result' => json_decode($response)];
+        $decodedResponse = json_decode($response);
+        $sanitizedResponse = $this->sanitizeLogResponse($decodedResponse);
+        logModuleCall("Open Provider SSl", $action, $data, $sanitizedResponse);
+        $helper->insertlogDetails($sanitizedResponse, (empty($data) ? ['url' => $apiUrl] : $data), $action);
+        return ['httpcode' => $httpCode, 'result' => $decodedResponse];
+    }
+
+    /**
+     * Private keys must never be persisted (module log / tblmodulelog), only
+     * returned once to the caller so it can be shown to the client.
+     */
+    private function sanitizeLogResponse($response)
+    {
+        if (is_object($response) && isset($response->data) && is_object($response->data) && property_exists($response->data, 'key')) {
+            $response = clone $response;
+            $response->data = clone $response->data;
+            $response->data->key = '[REDACTED]';
+        }
+        return $response;
     }
 
     public function get($url, $data = null, $action = '')

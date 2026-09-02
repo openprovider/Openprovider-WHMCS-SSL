@@ -394,6 +394,25 @@ class Helper
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="row" id="csr_result" style="display:none;">
+                                            <div class="col-md-12">
+                                                <div class="csr_token_content_main">
+                                                    <label for="csr_private_key">' . $LANG['private_key'] . '</label>
+                                                </div>
+                                                <div class="input-div" style="position:relative;">
+                                                    <textarea id="csr_private_key" class="form-control" rows="8" readonly></textarea>
+                                                    <button type="button" class="btn btn-default copy-key-btn" style="margin-top:5px;">
+                                                        <i class="fad fa-copy" aria-hidden="true"></i> ' . $LANG['copy_private_key'] . '
+                                                    </button>
+                                                </div>
+                                                <p class="text-danger" style="margin-top:10px;">' . $LANG['private_key_warning'] . '</p>
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" id="confirm_key_saved"> ' . $LANG['confirm_key_saved'] . '
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="modal-footer panel-footer" id="create_csrFooter">
                                                 <button id="modalAjaxClose" type="button" class="btn btn-default" data-dismiss="modal">
                                                     ' . $LANG['close'] . '

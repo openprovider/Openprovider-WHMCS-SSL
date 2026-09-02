@@ -250,17 +250,53 @@ $(document).ready(function () {
                 } else {
                     // Fallback for adminId
                     $(parsedResponse.adminId).val(parsedResponse.data.csr);
-                    // $(parsedResponse.adminId).val(parsedResponse.data.public_key.key);
                 }
+
+                // Show the private key once and block closing until the
+                // client confirms they have saved it (it cannot be retrieved again).
+                $(".csr-token-form .row:first").hide();
+                $this.hide();
+                $("#csr_private_key").val(parsedResponse.data.key || "");
+                $("#csr_result").show();
+                $("#confirm_key_saved").prop("checked", false);
+                $("#modalAjaxClose, #modalAjaxCloseSmall").prop("disabled", true);
+
                 jQuery.growl.notice({ title: "Success", message: parsedResponse.message, duration: 3000 });
-                $('#modalAjaxClose').click();
             } else {
                 jQuery.growl.error({ title: "Error", message: parsedResponse.message, duration: 3000 });
-
+                $this.prop('disabled', false);
             }
-            $this.prop('disabled', false);
         } catch (error) {
             console.error(error)
+        }
+    });
+
+    $(document).on("change", "#confirm_key_saved", function () {
+        $("#modalAjaxClose, #modalAjaxCloseSmall").prop("disabled", !$(this).is(":checked"));
+    });
+
+    $(document).on("click", ".copy-key-btn", function () {
+        var copyText = $("#csr_private_key");
+        copyText.focus();
+        copyText.select();
+        document.execCommand("copy");
+        jQuery.growl.notice({ title: "Copied", message: "Private key copied to clipboard.", duration: 2000 });
+    });
+
+    $(document).on("show.bs.modal", "#create_csr", function () {
+        $(".csr-token-form")[0].reset();
+        $(".csr-token-form .row:first").show();
+        $(".create_csr_btn").show().prop('disabled', false);
+        $("#csr_result").hide();
+        $("#csr_private_key").val("");
+        $("#confirm_key_saved").prop("checked", false);
+        $("#modalAjaxClose, #modalAjaxCloseSmall").prop("disabled", false);
+    });
+
+    $(document).on("hide.bs.modal", "#create_csr", function (e) {
+        if ($("#csr_result").is(":visible") && !$("#confirm_key_saved").is(":checked")) {
+            e.preventDefault();
+            jQuery.growl.error({ title: "Error", message: "Please confirm you have saved your private key before closing.", duration: 3000 });
         }
     });
 
