@@ -250,10 +250,10 @@ $(document).ready(function () {
                 } else {
                     // Fallback for adminId
                     $(parsedResponse.adminId).val(parsedResponse.data.csr);
+                    // $(parsedResponse.adminId).val(parsedResponse.data.public_key.key);
                 }
 
-                // Show the private key once and block closing until the
-                // client confirms they have saved it (it cannot be retrieved again).
+                // Show the private key once and block closing until the client confirms they have saved it
                 $(".csr-token-form .row:first").hide();
                 $this.hide();
                 $("#csr_private_key").val(parsedResponse.data.key || "");

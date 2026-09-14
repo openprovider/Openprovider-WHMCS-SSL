@@ -115,10 +115,7 @@ class ApiCall
         return ['httpcode' => $httpCode, 'result' => $decodedResponse];
     }
 
-    /**
-     * Private keys must never be persisted (module log / tblmodulelog), only
-     * returned once to the caller so it can be shown to the client.
-     */
+    // Sanitizes the response by redacting the private key.
     private function sanitizeLogResponse($response)
     {
         if (is_object($response) && isset($response->data) && is_object($response->data) && property_exists($response->data, 'key')) {
