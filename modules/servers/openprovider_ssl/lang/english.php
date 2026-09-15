@@ -33,7 +33,6 @@ $_ADDONLANG["private_key"] = "Private Key";
 $_ADDONLANG["copy_private_key"] = "Copy Private Key";
 $_ADDONLANG["private_key_warning"] = "This private key is generated once and cannot be retrieved again. Please save it in a secure location before closing this window.";
 $_ADDONLANG["confirm_key_saved"] = "I have saved my private key";
-$_ADDONLANG["confirm_key_saved_required"] = "Please confirm you have saved your private key before closing this window.";
 
 // csr token end
 
