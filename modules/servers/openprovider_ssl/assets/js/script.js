@@ -279,8 +279,17 @@ $(document).ready(function () {
         var copyText = $("#csr_private_key");
         copyText.focus();
         copyText.select();
-        document.execCommand("copy");
-        jQuery.growl.notice({ title: "Copied", message: "Private key copied to clipboard.", duration: 2000 });
+        var copied = false;
+        try {
+            copied = document.execCommand("copy");
+        } catch (error) {
+            copied = false;
+        }
+        if (copied) {
+            jQuery.growl.notice({ title: "Copied", message: "Private key copied to clipboard.", duration: 2000 });
+        } else {
+            jQuery.growl.error({ title: "Copy failed", message: "Could not copy automatically. Please select the private key text and copy it manually.", duration: 4000 });
+        }
     });
 
     $(document).on("show.bs.modal", "#create_csr", function () {
