@@ -119,11 +119,11 @@ class ApiCall
     private function getSensitiveLogValues($data, $response = null)
     {
         $values = [];
-        if (is_array($data) && !empty($data['password'])) {
+        if (is_array($data) && isset($data['password']) && $data['password'] !== '') {
             $values[] = $data['password'];
             $values[] = htmlentities($data['password']);
         }
-        if (is_object($response) && isset($response->data) && is_object($response->data) && !empty($response->data->token)) {
+        if (is_object($response) && isset($response->data) && is_object($response->data) && isset($response->data->token) && $response->data->token !== '') {
             $values[] = $response->data->token;
         }
         return $values;
@@ -140,7 +140,7 @@ class ApiCall
 
     private function sanitizeLogResponseToken($response)
     {
-        if (is_object($response) && isset($response->data) && is_object($response->data) && !empty($response->data->token)) {
+        if (is_object($response) && isset($response->data) && is_object($response->data) && isset($response->data->token) && $response->data->token !== '') {
             $response = clone $response;
             $response->data = clone $response->data;
             $response->data->token = str_repeat('*', strlen($response->data->token));
