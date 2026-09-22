@@ -112,7 +112,7 @@ class ApiCall
         $replaceVars = $this->getSensitiveLogValues($data, $decodedResponse);
         $sanitizedRequest = $this->sanitizeLogRequest($data);
         $sanitizedResponse = $this->sanitizeLogResponseToken($decodedResponse);
-        logModuleCall("Open Provider SSl test", $action, $data, $decodedResponse, null, $replaceVars);
+        logModuleCall("Open Provider SSl", $action, $data, $decodedResponse, null, $replaceVars);
         $helper->insertlogDetails($sanitizedResponse, (empty($data) ? ['url' => $apiUrl] : $sanitizedRequest), $action);
         return ['httpcode' => $httpCode, 'result' => $decodedResponse];
     }
@@ -140,7 +140,6 @@ class ApiCall
         return $data;
     }
 
-    // Same reasoning as sanitizeLogRequest(), but for the access token returned in the response.
     private function sanitizeLogResponseToken($response)
     {
         if (is_object($response) && isset($response->data) && is_object($response->data) && !empty($response->data->token)) {
