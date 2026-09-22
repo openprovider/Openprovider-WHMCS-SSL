@@ -109,20 +109,26 @@ class ApiCall
         }
         curl_close($curl);
         $decodedResponse = json_decode($response);
-        $replaceVars = $this->getSensitiveLogValues($data);
+        $replaceVars = $this->getSensitiveLogValues($data, $decodedResponse);
         $sanitizedRequest = $this->sanitizeLogRequest($data);
+        $sanitizedResponse = $this->sanitizeLogResponseToken($decodedResponse);
         logModuleCall("Open Provider SSl test", $action, $data, $decodedResponse, null, $replaceVars);
-        $helper->insertlogDetails($decodedResponse, (empty($data) ? ['url' => $apiUrl] : $sanitizedRequest), $action);
+        $helper->insertlogDetails($sanitizedResponse, (empty($data) ? ['url' => $apiUrl] : $sanitizedRequest), $action);
         return ['httpcode' => $httpCode, 'result' => $decodedResponse];
     }
 
     // Values logModuleCall should mask wherever they appear in the logged request/response.
-    private function getSensitiveLogValues($data)
+    private function getSensitiveLogValues($data, $response = null)
     {
+        $values = [];
         if (is_array($data) && !empty($data['password'])) {
-            return [$data['password'], htmlentities($data['password'])];
+            $values[] = $data['password'];
+            $values[] = htmlentities($data['password']);
         }
-        return [];
+        if (is_object($response) && isset($response->data) && is_object($response->data) && !empty($response->data->token)) {
+            $values[] = $response->data->token;
+        }
+        return $values;
     }
 
     // modssl_logs is our own table, not covered by logModuleCall's masking, so mask known-sensitive fields ourselves.
@@ -132,6 +138,17 @@ class ApiCall
             $data['password'] = str_repeat('*', strlen($data['password']));
         }
         return $data;
+    }
+
+    // Same reasoning as sanitizeLogRequest(), but for the access token returned in the response.
+    private function sanitizeLogResponseToken($response)
+    {
+        if (is_object($response) && isset($response->data) && is_object($response->data) && !empty($response->data->token)) {
+            $response = clone $response;
+            $response->data = clone $response->data;
+            $response->data->token = str_repeat('*', strlen($response->data->token));
+        }
+        return $response;
     }
 
     public function get($url, $data = null, $action = '')
