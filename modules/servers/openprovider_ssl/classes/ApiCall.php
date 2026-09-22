@@ -111,7 +111,7 @@ class ApiCall
         $decodedResponse = json_decode($response);
         $replaceVars = $this->getSensitiveLogValues($data);
         $sanitizedRequest = $this->sanitizeLogRequest($data);
-        logModuleCall("Open Provider SSl", $action, $data, $decodedResponse, null, $replaceVars);
+        logModuleCall("Open Provider SSl test", $action, $data, $decodedResponse, null, $replaceVars);
         $helper->insertlogDetails($decodedResponse, (empty($data) ? ['url' => $apiUrl] : $sanitizedRequest), $action);
         return ['httpcode' => $httpCode, 'result' => $decodedResponse];
     }
