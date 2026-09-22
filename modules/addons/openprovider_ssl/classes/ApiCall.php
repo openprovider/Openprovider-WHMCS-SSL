@@ -106,10 +106,31 @@ class ApiCall
             throw new \Exception(curl_error($curl));
         }
         curl_close($curl);
-        logModuleCall("Open Provider SSl", $action, $data, json_decode($response));
+        $decodedResponse = json_decode($response);
+        $replaceVars = $this->getSensitiveLogValues($data);
+        $sanitizedRequest = $this->sanitizeLogRequest($data);
+        // logModuleCall masks $replaceVars values itself wherever they appear, same as modules/registrars/openprovider's Logger.
+        logModuleCall("Open Provider SSl", $action, $data, $decodedResponse, null, $replaceVars);
+        $helper->insertlogDetails($decodedResponse, (empty($data) ? ['url' => $apiUrl] : $sanitizedRequest), $action);
+        return ['httpcode' => $httpCode, 'result' => $decodedResponse];
+    }
 
-        $helper->insertlogDetails(json_decode($response), (empty($data) ? ['url' => $apiUrl] : $data), $action);
-        return ['httpcode' => $httpCode, 'result' => json_decode($response)];
+    // Values logModuleCall should mask wherever they appear in the logged request/response.
+    private function getSensitiveLogValues($data)
+    {
+        if (is_array($data) && !empty($data['password'])) {
+            return [$data['password'], htmlentities($data['password'])];
+        }
+        return [];
+    }
+
+    // modssl_logs is our own table, not covered by logModuleCall's masking, so mask known-sensitive fields ourselves.
+    private function sanitizeLogRequest($data)
+    {
+        if (is_array($data) && array_key_exists('password', $data)) {
+            $data['password'] = str_repeat('*', strlen($data['password']));
+        }
+        return $data;
     }
 
     public function get($url, $data = null, $action = '')
