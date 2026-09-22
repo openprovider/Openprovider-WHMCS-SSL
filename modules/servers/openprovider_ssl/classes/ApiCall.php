@@ -108,9 +108,20 @@ class ApiCall
             throw new \Exception(curl_error($curl));
         }
         curl_close($curl);
-        logModuleCall("Open Provider SSl", $action, $data, json_decode($response));
-        $helper->insertlogDetails(json_decode($response), (empty($data) ? ['url' => $apiUrl] : $data), $action);
-        return ['httpcode' => $httpCode, 'result' => json_decode($response)];
+        $decodedResponse = json_decode($response);
+        $sanitizedRequest = $this->sanitizeLogRequest($data);
+        logModuleCall("Open Provider SSl", $action, $sanitizedRequest, $decodedResponse);
+        $helper->insertlogDetails($decodedResponse, (empty($data) ? ['url' => $apiUrl] : $sanitizedRequest), $action);
+        return ['httpcode' => $httpCode, 'result' => $decodedResponse];
+    }
+
+    // Redacts known-sensitive fields (e.g. the reseller API password) from a request payload before logging.
+    private function sanitizeLogRequest($data)
+    {
+        if (is_array($data) && array_key_exists('password', $data)) {
+            $data['password'] = '[REDACTED]';
+        }
+        return $data;
     }
 
     public function get($url, $data = null, $action = '')
