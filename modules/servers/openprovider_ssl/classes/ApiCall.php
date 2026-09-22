@@ -109,17 +109,27 @@ class ApiCall
         }
         curl_close($curl);
         $decodedResponse = json_decode($response);
+        $replaceVars = $this->getSensitiveLogValues($data);
         $sanitizedRequest = $this->sanitizeLogRequest($data);
-        logModuleCall("Open Provider SSl", $action, $sanitizedRequest, $decodedResponse);
+        logModuleCall("Open Provider SSl", $action, $data, $decodedResponse, null, $replaceVars);
         $helper->insertlogDetails($decodedResponse, (empty($data) ? ['url' => $apiUrl] : $sanitizedRequest), $action);
         return ['httpcode' => $httpCode, 'result' => $decodedResponse];
     }
 
-    // Redacts known-sensitive fields (e.g. the reseller API password) from a request payload before logging.
+    // Values logModuleCall should mask wherever they appear in the logged request/response.
+    private function getSensitiveLogValues($data)
+    {
+        if (is_array($data) && !empty($data['password'])) {
+            return [$data['password'], htmlentities($data['password'])];
+        }
+        return [];
+    }
+
+    // modssl_logs is our own table, not covered by logModuleCall's masking, so mask known-sensitive fields ourselves.
     private function sanitizeLogRequest($data)
     {
         if (is_array($data) && array_key_exists('password', $data)) {
-            $data['password'] = '[REDACTED]';
+            $data['password'] = str_repeat('*', strlen($data['password']));
         }
         return $data;
     }
