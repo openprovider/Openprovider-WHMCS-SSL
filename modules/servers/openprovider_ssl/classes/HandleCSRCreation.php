@@ -82,7 +82,7 @@ class HandleCSRCreation
         if (file_exists($langfilename)) {
             require($langfilename);
         } else {
-            require(__DIR__ . '/lang/english.php');
+            require(__DIR__ . '/../lang/english.php');
         }
         $LANG = $_ADDONLANG;
 
