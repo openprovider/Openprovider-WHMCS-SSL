@@ -135,7 +135,7 @@ class ApiCall
     private function sanitizeLogRequest($data)
     {
         if (is_array($data) && array_key_exists('password', $data)) {
-            $data['password'] = str_repeat('*', strlen($data['password']));
+            $data['password'] = '********';
         }
         return $data;
     }
@@ -145,7 +145,7 @@ class ApiCall
         if (is_object($response) && isset($response->data) && is_object($response->data) && isset($response->data->token) && $response->data->token !== '') {
             $response = clone $response;
             $response->data = clone $response->data;
-            $response->data->token = str_repeat('*', strlen($response->data->token));
+            $response->data->token = '********';
         }
         return $response;
     }
