@@ -109,19 +109,55 @@ class ApiCall
         }
         curl_close($curl);
         $decodedResponse = json_decode($response);
+        $replaceVars = $this->getSensitiveLogValues($data, $decodedResponse);
+        $sanitizedRequest = $this->sanitizeLogRequest($data);
         $sanitizedResponse = $this->sanitizeLogResponse($decodedResponse);
-        logModuleCall("Open Provider SSl", $action, $data, $sanitizedResponse);
-        $helper->insertlogDetails($sanitizedResponse, (empty($data) ? ['url' => $apiUrl] : $data), $action);
+        logModuleCall("Open Provider SSl", $action, $data, $sanitizedResponse, null, $replaceVars);
+        $helper->insertlogDetails($sanitizedResponse, (empty($data) ? ['url' => $apiUrl] : $sanitizedRequest), $action);
         return ['httpcode' => $httpCode, 'result' => $decodedResponse];
     }
 
-    // Sanitizes the response by redacting the private key.
+    // Values logModuleCall should mask wherever they appear in the logged request/response.
+    private function getSensitiveLogValues($data, $response = null)
+    {
+        $values = [];
+        if (is_array($data) && isset($data['password']) && $data['password'] !== '') {
+            $values[] = $data['password'];
+            $values[] = htmlentities($data['password']);
+        }
+        if (is_object($response) && isset($response->data) && is_object($response->data) && isset($response->data->token) && $response->data->token !== '') {
+            $values[] = $response->data->token;
+        }
+        return $values;
+    }
+
+    // modssl_logs is our own table, not covered by logModuleCall's masking, so mask known-sensitive fields ourselves.
+    private function sanitizeLogRequest($data)
+    {
+        if (is_array($data) && array_key_exists('password', $data)) {
+            $data['password'] = '********';
+        }
+        return $data;
+    }
+    
+    // Redacts sensitive response fields (private key, auth token) before logging.
     private function sanitizeLogResponse($response)
     {
-        if (is_object($response) && isset($response->data) && is_object($response->data) && property_exists($response->data, 'key')) {
-            $response = clone $response;
-            $response->data = clone $response->data;
+        if (!is_object($response) || !isset($response->data) || !is_object($response->data)) {
+            return $response;
+        }
+        $hasKey = property_exists($response->data, 'key');
+        $hasToken = isset($response->data->token) && $response->data->token !== '';
+        if (!$hasKey && !$hasToken) {
+            return $response;
+        }
+        $response = clone $response;
+        $response->data = clone $response->data;
+        if ($hasKey) {
             $response->data->key = '[REDACTED]';
+        }
+        if ($hasToken) {
+            $response->data->token = '********';
         }
         return $response;
     }
