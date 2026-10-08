@@ -111,8 +111,8 @@ class ApiCall
         $decodedResponse = json_decode($response);
         $replaceVars = $this->getSensitiveLogValues($data, $decodedResponse);
         $sanitizedRequest = $this->sanitizeLogRequest($data);
-        $sanitizedResponse = $this->sanitizeLogResponseToken($decodedResponse);
-        logModuleCall("Open Provider SSl", $action, $data, $decodedResponse, null, $replaceVars);
+        $sanitizedResponse = $this->sanitizeLogResponse($decodedResponse);
+        logModuleCall("Open Provider SSl", $action, $data, $sanitizedResponse, null, $replaceVars);
         $helper->insertlogDetails($sanitizedResponse, (empty($data) ? ['url' => $apiUrl] : $sanitizedRequest), $action);
         return ['httpcode' => $httpCode, 'result' => $decodedResponse];
     }
@@ -139,12 +139,24 @@ class ApiCall
         }
         return $data;
     }
-
-    private function sanitizeLogResponseToken($response)
+    
+    // Redacts sensitive response fields (private key, auth token) before logging.
+    private function sanitizeLogResponse($response)
     {
-        if (is_object($response) && isset($response->data) && is_object($response->data) && isset($response->data->token) && $response->data->token !== '') {
-            $response = clone $response;
-            $response->data = clone $response->data;
+        if (!is_object($response) || !isset($response->data) || !is_object($response->data)) {
+            return $response;
+        }
+        $hasKey = property_exists($response->data, 'key');
+        $hasToken = isset($response->data->token) && $response->data->token !== '';
+        if (!$hasKey && !$hasToken) {
+            return $response;
+        }
+        $response = clone $response;
+        $response->data = clone $response->data;
+        if ($hasKey) {
+            $response->data->key = '[REDACTED]';
+        }
+        if ($hasToken) {
             $response->data->token = '********';
         }
         return $response;
