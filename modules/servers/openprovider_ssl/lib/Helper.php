@@ -452,7 +452,7 @@ class Helper
                 if ($custom_field_data) {
                     $field_value = Capsule::table('tblcustomfieldsvalues')->where("fieldid", "=", $custom_field_data->id)->where("relid", "=", $serviceid)->first();
                     /* checking field value exist */
-                    if ($field_value->id) {
+                    if (!empty($field_value->id)) {
                         /* updating */
                         $field_value = Capsule::table('tblcustomfieldsvalues')->where("fieldid", "=", $custom_field_data->id)->where("relid", "=", $serviceid)->update(["value" => $value]);
                     } else {
@@ -467,6 +467,16 @@ class Helper
             logActivity('funtion(insert_custom_fields_value) Error:', $e->getMessage());
             return $e->getMessage();
         }
+    }
+
+    public function getServiceCustomFieldValue($serviceid, $package_id, $key)
+    {
+        $custom_field_data = Capsule::table('tblcustomfields')->where("type", "product")->where("fieldname", "like", "%$key%")->where("relid", $package_id)->first();
+        if (!$custom_field_data) {
+            return null;
+        }
+
+        return Capsule::table('tblcustomfieldsvalues')->where("fieldid", "=", $custom_field_data->id)->where("relid", "=", $serviceid)->value('value');
     }
 
     public function createCustomFields($customfieldarray)
