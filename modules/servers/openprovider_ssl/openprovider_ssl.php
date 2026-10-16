@@ -312,6 +312,11 @@ function openprovider_ssl_CreateAccount(array $params)
         $serviceId = $params['serviceid'];
         $pid = $params['pid'];
 
+        // Prevent placing a second (paid) order for a service that already has one
+        if (!empty($params['customfields']['ssl_id'])) {
+            return 'This service already has SSL order ' . $params['customfields']['ssl_id'] . '. A new order was not created.';
+        }
+
         $handle = $helper->getClientCustomField($params['userid']);
 
         $orgnizationHandle = "";
@@ -397,9 +402,11 @@ function openprovider_ssl_CreateAccount(array $params)
         $helper->insert_custom_fields_value($serviceId, $pid, $fields);
 
         if (empty($helper->getServiceCustomFieldValue($serviceId, $pid, 'ssl_id'))) {
-            $error = 'SSL order ' . $sslId . ' was created but its ID could not be saved to this service. Set the "SSL Id" field to ' . $sslId . ' manually.';
-            logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $error);
-            return $error;
+            $message = 'SSL order ' . $sslId . ' was created but its ID could not be saved to the "SSL Id" field. Set the "SSL Id" field to ' . $sslId . ' manually.';
+            $notes = Capsule::table('tblhosting')->where('id', $serviceId)->value('notes');
+            Capsule::table('tblhosting')->where('id', $serviceId)->update(['notes' => trim($notes . "\n" . $message)]);
+            logActivity('Openprovider SSL: ' . $message . ' Service ID: ' . $serviceId);
+            logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $message);
         }
 
         logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $createOrder['result']);
