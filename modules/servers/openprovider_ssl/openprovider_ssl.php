@@ -609,7 +609,7 @@ function openprovider_ssl_Renew(array $params)
             // Make sure the "SSL Id" field exists so the admin can fill it in on the service page
             $helper->createCustomFields(openprovider_ssl_CustomFieldDefinitions($params['pid']));
 
-            $error = 'SSL order ID is missing for this service. Set the "SSL Id" field below to the Openprovider SSL order ID and try again.';
+            $error = 'SSL order ID is missing for this service. Set the "SSL Id" field below to the Openprovider SSL order ID and try again. You can find it in RCP > SSL Panel > Orders > Openprovider Order ID.';
             logModuleCall('Openprovider SSL', __FUNCTION__, $params, $error);
             return $error;
         }
