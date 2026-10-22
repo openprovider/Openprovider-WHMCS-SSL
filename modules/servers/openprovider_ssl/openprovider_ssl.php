@@ -65,6 +65,85 @@ function openprovider_ssl_TestConnection(array $params)
     );
 }
 
+function openprovider_ssl_CustomFieldDefinitions($pid)
+{
+    return [
+        'approver_email' =>
+        [
+            'type' => 'product',
+            'fieldname' => 'approver_email|Approver Email',
+            'relid' => $pid,
+            'fieldtype' => 'dropdown',
+            'description' => '',
+            'adminonly' => '',
+            'required' => 'on',
+            'showorder' => 'on',
+            'sortorder' => '0',
+            'fieldoptions' => 'admin,administrator,hostmaster,postmaster,webmaster',
+        ],
+        'csr' =>
+        [
+            'type' => 'product',
+            'fieldname' => 'csr|CSR',
+            'relid' => $pid,
+            'fieldtype' => 'textarea',
+            'description' => '',
+            'adminonly' => '',
+            'required' => 'on',
+            'showorder' => 'on',
+            'sortorder' => '1',
+        ],
+        'ssl_id' =>
+        [
+            'type' => 'product',
+            'fieldname' => 'ssl_id|SSL Id',
+            'relid' => $pid,
+            'fieldtype' => 'text',
+            'description' => '',
+            'adminonly' => 'on',
+            'required' => '',
+            'showorder' => '',
+            'sortorder' => '',
+        ],
+        'organization_handle' =>
+        [
+            'type' => 'product',
+            'fieldname' => 'organization_handle|Organization Handle',
+            'relid' => $pid,
+            'fieldtype' => 'text',
+            'description' => '',
+            'adminonly' => 'on',
+            'required' => '',
+            'showorder' => '',
+            'sortorder' => '',
+        ],
+        'organization_handle' =>
+        [
+            'type' => 'client',
+            'fieldtype' => 'text',
+            'relid' => '0',
+            'fieldname' => 'organization_handle|Organization Handle',
+            'description' => 'use carefully',
+            'adminonly' => 'on',
+            'required' => '',
+            'showorder' => '',
+            'showinvoice' => '',
+        ],
+    ];
+    // 'technical_handle' =>
+    // [
+    //     'type' => 'product',
+    //     'fieldname' => 'technical_handle|Technical Handle',
+    //     'relid' => $pid,
+    //     'fieldtype' => 'text',
+    //     'description' => '',
+    //     'adminonly' => 'on',
+    //     'required' => '',
+    //     'showorder' => '',
+    //     'sortorder' => '',
+    // ],
+}
+
 function openprovider_ssl_ConfigOptions(array $params)
 {
     try {
@@ -87,82 +166,7 @@ function openprovider_ssl_ConfigOptions(array $params)
 
         $pid = $whmcs->get_req_var("id");
 
-        $customfieldarray = [
-            'approver_email' =>
-            [
-                'type' => 'product',
-                'fieldname' => 'approver_email|Approver Email',
-                'relid' => $pid,
-                'fieldtype' => 'dropdown',
-                'description' => '',
-                'adminonly' => '',
-                'required' => 'on',
-                'showorder' => 'on',
-                'sortorder' => '0',
-                'fieldoptions' => 'admin,administrator,hostmaster,postmaster,webmaster',
-            ],
-            'csr' =>
-            [
-                'type' => 'product',
-                'fieldname' => 'csr|CSR',
-                'relid' => $pid,
-                'fieldtype' => 'textarea',
-                'description' => '',
-                'adminonly' => '',
-                'required' => 'on',
-                'showorder' => 'on',
-                'sortorder' => '1',
-            ],
-            'ssl_id' =>
-            [
-                'type' => 'product',
-                'fieldname' => 'ssl_id|SSL Id',
-                'relid' => $pid,
-                'fieldtype' => 'text',
-                'description' => '',
-                'adminonly' => 'on',
-                'required' => '',
-                'showorder' => '',
-                'sortorder' => '',
-            ],
-            'organization_handle' =>
-            [
-                'type' => 'product',
-                'fieldname' => 'organization_handle|Organization Handle',
-                'relid' => $pid,
-                'fieldtype' => 'text',
-                'description' => '',
-                'adminonly' => 'on',
-                'required' => '',
-                'showorder' => '',
-                'sortorder' => '',
-            ],
-            'organization_handle' =>
-            [
-                'type' => 'client',
-                'fieldtype' => 'text',
-                'relid' => '0',
-                'fieldname' => 'organization_handle|Organization Handle',
-                'description' => 'use carefully',
-                'adminonly' => 'on',
-                'required' => '',
-                'showorder' => '',
-                'showinvoice' => '',
-            ],
-        ];
-        // 'technical_handle' =>
-        // [
-        //     'type' => 'product',
-        //     'fieldname' => 'technical_handle|Technical Handle',
-        //     'relid' => $pid,
-        //     'fieldtype' => 'text',
-        //     'description' => '',
-        //     'adminonly' => 'on',
-        //     'required' => '',
-        //     'showorder' => '',
-        //     'sortorder' => '',
-        // ],
-        $helper->createCustomFields($customfieldarray);
+        $helper->createCustomFields(openprovider_ssl_CustomFieldDefinitions($pid));
         // $helper->createResellerEmailTemplates();
         $helper->createConfigurableOptions($pid);
 
@@ -308,6 +312,11 @@ function openprovider_ssl_CreateAccount(array $params)
         $serviceId = $params['serviceid'];
         $pid = $params['pid'];
 
+        // Prevent placing a second (paid) order for a service that already has one
+        if (!empty($params['customfields']['ssl_id'])) {
+            return 'This service already has SSL order ' . $params['customfields']['ssl_id'] . '. A new order was not created.';
+        }
+
         $handle = $helper->getClientCustomField($params['userid']);
 
         $orgnizationHandle = "";
@@ -385,8 +394,20 @@ function openprovider_ssl_CreateAccount(array $params)
             return $createOrder['result']->desc;
         }
 
-        $fields = ["ssl_id" => $createOrder['result']->data->id, "organization_handle" => $orgnizationHandle];
+        // Make sure the product custom fields exist, otherwise the SSL order ID is silently not stored
+        $helper->createCustomFields(openprovider_ssl_CustomFieldDefinitions($pid));
+
+        $sslId = $createOrder['result']->data->id;
+        $fields = ["ssl_id" => $sslId, "organization_handle" => $orgnizationHandle];
         $helper->insert_custom_fields_value($serviceId, $pid, $fields);
+
+        if (empty($helper->getServiceCustomFieldValue($serviceId, $pid, 'ssl_id'))) {
+            $message = 'SSL order ' . $sslId . ' was created but its ID could not be saved to the "SSL Id" field. Set the "SSL Id" field to ' . $sslId . ' manually.';
+            $notes = Capsule::table('tblhosting')->where('id', $serviceId)->value('notes');
+            Capsule::table('tblhosting')->where('id', $serviceId)->update(['notes' => trim($notes . "\n" . $message)]);
+            logActivity('Openprovider SSL: ' . $message . ' Service ID: ' . $serviceId);
+            logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $message);
+        }
 
         logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $createOrder['result']);
         return "success";
@@ -583,12 +604,22 @@ function openprovider_ssl_Renew(array $params)
         $helper = new Helper();
         $apiCall = new ApiCall();
 
+        $sslId = (int) ($params['customfields']['ssl_id'] ?? 0);
+        if ($sslId <= 0) {
+            // Make sure the "SSL Id" field exists so the admin can fill it in on the service page
+            $helper->createCustomFields(openprovider_ssl_CustomFieldDefinitions($params['pid']));
+
+            $error = 'SSL order ID is missing for this service. Set the "SSL Id" field below to the Openprovider SSL order ID and try again. You can find it in RCP > SSL Panel > Orders > Openprovider Order ID.';
+            logModuleCall('Openprovider SSL', __FUNCTION__, $params, $error);
+            return $error;
+        }
+
         $postData = [
-            "id" => $params['customfields']['ssl_id'],
+            "id" => $sslId,
         ];
 
         $baseUrl = $helper->getBaseUrl();
-        $renewOrder = $apiCall->post($baseUrl . '/ssl/orders/' . $params['customfields']['ssl_id'] . '/renew', $postData, "Renew order");
+        $renewOrder = $apiCall->post($baseUrl . '/ssl/orders/' . $sslId . '/renew', $postData, "Renew order");
 
         if ($renewOrder['httpcode'] != 200) {
             return $renewOrder['result']->desc;
