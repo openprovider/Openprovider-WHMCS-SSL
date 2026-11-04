@@ -69,12 +69,17 @@ class MaskCredentialsInLogs extends Migration
         });
     }
 
-    // Module Log rows from exception handlers that logged the whole $params.
-    // Matched on moduletype because these were logged under several module names.
+    // Module Log rows from exception handlers that logged $params, matched on moduletype (or module + action for TestConnection, which has none).
     private function maskModuleLogParams()
     {
         $query = Capsule::table('tblmodulelog')
-            ->where('request', 'like', '%[moduletype] => openprovider_ssl%')
+            ->where(function ($q) {
+                $q->where('request', 'like', '%[moduletype] => openprovider_ssl%')
+                    ->orWhere(function ($q) {
+                        $q->where('module', 'openprovider_ssl')
+                            ->where('action', 'openprovider_ssl_testconnection');
+                    });
+            })
             ->where(function ($q) {
                 $q->where('request', 'like', '%[serverpassword] => %')
                     ->orWhere('request', 'like', '%[serveraccesshash] => %');
