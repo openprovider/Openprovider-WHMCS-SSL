@@ -206,7 +206,7 @@ add_hook('AfterCronJob', 1, function ($vars) {
     try {
         require_once __DIR__ . '/classes/MigrationRunner.php';
         (new \Module\OpenproviderSsl\Server\classes\MigrationRunner())->run();
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         logActivity("Error Occur Openprovider SSL migrations: " . $e->getMessage());
     }
 });
