@@ -201,3 +201,12 @@ add_hook('AdminAreaHeadOutput', 1, function ($vars) {
     }
 });
 
+// Runs pending migrations from ./migrations once each, from cron so large log tables never slow down a page load.
+add_hook('AfterCronJob', 1, function ($vars) {
+    try {
+        require_once __DIR__ . '/classes/MigrationRunner.php';
+        (new \Module\OpenproviderSsl\Server\classes\MigrationRunner())->run();
+    } catch (\Throwable $e) {
+        logActivity("Error Occur Openprovider SSL migrations: " . $e->getMessage());
+    }
+});
