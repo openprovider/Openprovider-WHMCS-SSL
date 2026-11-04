@@ -11,7 +11,7 @@ if (!defined("WHMCS")) {
 /**
  * Runs pending migrations from ../migrations once each.
  *
- * Uses the same modwMigrations table and layout as the registrar module (wPower),
+ * Uses the same modwMigrations table and layout as the registrar module,
  * scoped by module + type, so both modules can share the table safely.
  */
 class MigrationRunner
