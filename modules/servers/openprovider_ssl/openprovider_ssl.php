@@ -356,19 +356,24 @@ function openprovider_ssl_CreateAccount(array $params)
             $orgnizationHandle = $handle;
         }
 
+        $domain = trim((string) ($params['customfields']['domain'] ?? ($params['domain'] ?? '')));
+        if ($domain === '') {
+            return 'Domain is required to create an SSL order.';
+        }
+        $emailDomain = preg_replace('/^\*\./', '', $domain);
         $postData = [
-            "approver_email" => $params['customfields']['approver_email'] . '@' . $params['domain'],
+            "approver_email" => $params['customfields']['approver_email'] . '@' . $emailDomain,
             "autorenew" => ($params['configoption2'] == 'on') ? 'on' : 'off',
             "csr" => $params['customfields']['csr'],
             "domain_amount" => $params['configoptions']['no_of_domain'],
             "domain_validation_methods" => [
                 [
-                    "host_name" => $params['domain'],
+                    "host_name" => $domain,
                     "method" => "email"
                 ],
             ],
             "host_names" => [
-                $params['domain'],
+                $domain,
             ],
             "organization_handle" => $orgnizationHandle,
             "enable_dns_automation" => ($params['configoption3'] == 'on') ? true : false,
