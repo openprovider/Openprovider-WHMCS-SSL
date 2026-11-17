@@ -9,17 +9,6 @@ if (!defined("WHMCS")) {
     die("This file cannot be accessed directly");
 }
 
-// Mask credentials in $params before passing them to logModuleCall().
-function openprovider_ssl_maskSensitiveParams($params)
-{
-    foreach (['password', 'serverpassword', 'serveraccesshash'] as $key) {
-        if (isset($params[$key]) && $params[$key] !== '') {
-            $params[$key] = '********';
-        }
-    }
-    return $params;
-}
-
 function openprovider_ssl_MetaData()
 {
     return array(
@@ -62,9 +51,10 @@ function openprovider_ssl_TestConnection(array $params)
         logModuleCall(
             'openprovider_ssl',
             __FUNCTION__,
-            openprovider_ssl_maskSensitiveParams($params),
+            $params,
             $e->getMessage(),
-            $e->getTraceAsString()
+            $e->getTraceAsString(),
+            Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS)
         );
 
         $success = false;
@@ -303,9 +293,10 @@ function openprovider_ssl_ConfigOptions(array $params)
         logModuleCall(
             'Openprovider SSL',
             __FUNCTION__,
-            openprovider_ssl_maskSensitiveParams($params),
+            $params,
             $e->getMessage(),
-            $e->getTraceAsString()
+            $e->getTraceAsString(),
+            Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS)
         );
         return $e->getMessage();
     }
@@ -403,7 +394,7 @@ function openprovider_ssl_CreateAccount(array $params)
         logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $createOrder['result']);
         return "success";
     } catch (Exception $e) {
-        logModuleCall('Openprovider SSL', __FUNCTION__, openprovider_ssl_maskSensitiveParams($params), $e->getMessage(), $e->getTraceAsString());
+        logModuleCall('Openprovider SSL', __FUNCTION__, $params, $e->getMessage(), $e->getTraceAsString(), Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS));
         return $e->getMessage();
     }
 }
@@ -413,7 +404,7 @@ function openprovider_ssl_SuspendAccount(array $params)
     try {
         return "success";
     } catch (Exception $e) {
-        logModuleCall('Openprovider SSL', __FUNCTION__, openprovider_ssl_maskSensitiveParams($params), $e->getMessage(), $e->getTraceAsString());
+        logModuleCall('Openprovider SSL', __FUNCTION__, $params, $e->getMessage(), $e->getTraceAsString(), Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS));
         return $e->getMessage();
     }
 }
@@ -423,7 +414,7 @@ function openprovider_ssl_UnsuspendAccount(array $params)
     try {
         return "success";
     } catch (Exception $e) {
-        logModuleCall('Openprovider SSL', __FUNCTION__, openprovider_ssl_maskSensitiveParams($params), $e->getMessage(), $e->getTraceAsString());
+        logModuleCall('Openprovider SSL', __FUNCTION__, $params, $e->getMessage(), $e->getTraceAsString(), Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS));
         return $e->getMessage();
     }
 }
@@ -448,7 +439,7 @@ function openprovider_ssl_TerminateAccount(array $params)
         logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $cancleOrder['result']);
         return "success";
     } catch (Exception $e) {
-        logModuleCall('Openprovider SSL', __FUNCTION__, openprovider_ssl_maskSensitiveParams($params), $e->getMessage(), $e->getTraceAsString());
+        logModuleCall('Openprovider SSL', __FUNCTION__, $params, $e->getMessage(), $e->getTraceAsString(), Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS));
         return $e->getMessage();
     }
 }
@@ -583,7 +574,7 @@ function openprovider_ssl_AdminServicesTabFields(array $params)
             return $fieldArray;
         }
     } catch (Exception $e) {
-        logModuleCall('soyoustart', __FUNCTION__, openprovider_ssl_maskSensitiveParams($params), $e->getMessage(), $e->getTraceAsString());
+        logModuleCall('Openprovider SSL', __FUNCTION__, $params, $e->getMessage(), $e->getTraceAsString(), Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS));
     }
 
     return array();
@@ -612,9 +603,10 @@ function openprovider_ssl_Renew(array $params)
         logModuleCall(
             'openprovider_ssl ',
             __FUNCTION__,
-            openprovider_ssl_maskSensitiveParams($params),
+            $params,
             $e->getMessage(),
-            $e->getTraceAsString()
+            $e->getTraceAsString(),
+            Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS)
         );
 
         return $e->getMessage();
@@ -652,7 +644,7 @@ function openprovider_ssl_update_email(array $params)
         logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $updateEmail['result']);
         return 'success';
     } catch (Exception $e) {
-        logModuleCall('Openprovider SSL', __FUNCTION__, openprovider_ssl_maskSensitiveParams($params), $e->getMessage(), $e->getTraceAsString());
+        logModuleCall('Openprovider SSL', __FUNCTION__, $params, $e->getMessage(), $e->getTraceAsString(), Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS));
         return $e->getMessage();
     }
 }
@@ -693,7 +685,7 @@ function openprovider_ssl_reissue(array $params)
         logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $reissueOrder['result']);
         return 'success';
     } catch (Exception $e) {
-        logModuleCall('Openprovider SSL', __FUNCTION__, openprovider_ssl_maskSensitiveParams($params), $e->getMessage(), $e->getTraceAsString());
+        logModuleCall('Openprovider SSL', __FUNCTION__, $params, $e->getMessage(), $e->getTraceAsString(), Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS));
         return $e->getMessage();
     }
 }
@@ -717,7 +709,7 @@ function openprovider_ssl_resend_approval(array $params)
         logModuleCall('Openprovider SSL', __FUNCTION__, $postData, $resendApproval['result']);
         return 'success';
     } catch (Exception $e) {
-        logModuleCall('Openprovider SSL', __FUNCTION__, openprovider_ssl_maskSensitiveParams($params), $e->getMessage(), $e->getTraceAsString());
+        logModuleCall('Openprovider SSL', __FUNCTION__, $params, $e->getMessage(), $e->getTraceAsString(), Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS));
         return $e->getMessage();
     }
 }
@@ -867,7 +859,7 @@ function openprovider_ssl_ClientArea(array $params)
             );
         }
     } catch (Exception $e) {
-        logModuleCall(basename(__FILE__, '.php'), __FUNCTION__, openprovider_ssl_maskSensitiveParams($params), $e->getMessage(), $e->getTraceAsString());
+        logModuleCall(basename(__FILE__, '.php'), __FUNCTION__, $params, $e->getMessage(), $e->getTraceAsString(), Helper::sensitiveLogValues($params, Helper::SENSITIVE_PARAM_KEYS));
         return array(
             'templatefile' => 'templates/error.tpl',
             'templateVariables' => array(
