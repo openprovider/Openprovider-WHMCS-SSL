@@ -120,11 +120,7 @@ class ApiCall
     // Values logModuleCall should mask wherever they appear in the logged request/response.
     private function getSensitiveLogValues($data, $response = null)
     {
-        $values = [];
-        if (is_array($data) && isset($data['password']) && $data['password'] !== '') {
-            $values[] = $data['password'];
-            $values[] = htmlentities($data['password']);
-        }
+        $values = Helper::sensitiveLogValues($data, ['password']);
         if (is_object($response) && isset($response->data) && is_object($response->data) && isset($response->data->token) && $response->data->token !== '') {
             $values[] = $response->data->token;
         }
