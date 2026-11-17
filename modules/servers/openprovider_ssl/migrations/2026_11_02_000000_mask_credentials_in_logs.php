@@ -11,7 +11,7 @@ if (!defined("WHMCS")) {
  * One-time cleanup (INTGRTNS-597) of credentials logged in plaintext before INTGRTNS-590.
  *
  * TODO: Remove this migration in the next major version. It only cleans up existing data;
- * new log entries are already masked by ApiCall::__curlCall() and openprovider_ssl_maskSensitiveParams().
+ * new log entries are already masked by ApiCall::__curlCall() and logModuleCall()'s $replaceVars.
  *
  * Only the credential values are replaced; the rest of each row is left byte-for-byte unchanged.
  * Values that are empty or already masked (all '*') are skipped, so running it again changes nothing.
