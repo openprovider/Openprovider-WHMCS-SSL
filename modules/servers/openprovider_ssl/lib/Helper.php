@@ -10,6 +10,9 @@ if (!defined("WHMCS")) {
 
 class Helper
 {
+    // $params keys whose values must never appear in plaintext in the Module Log.
+    const SENSITIVE_PARAM_KEYS = ['password', 'serverpassword', 'serveraccesshash'];
+
     public function fetch_table_record($tableName, $conditions, $for, $columnValue = null, $order = null, $limit = null)
     {
         try {
@@ -758,5 +761,21 @@ class Helper
                 'description' => 'Somthing Went Wrong' . $e->getMessage(),
             ];
         }
+    }
+
+    // Non-empty $data[$key] values and their HTML-escaped forms, for logModuleCall's $replaceVars.
+    public static function sensitiveLogValues($data, array $keys)
+    {
+        $values = [];
+        if (!is_array($data)) {
+            return $values;
+        }
+        foreach ($keys as $key) {
+            if (isset($data[$key]) && $data[$key] !== '') {
+                $values[] = $data[$key];
+                $values[] = htmlentities($data[$key]);
+            }
+        }
+        return array_values(array_unique($values));
     }
 }
